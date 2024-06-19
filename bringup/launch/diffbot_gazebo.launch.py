@@ -17,7 +17,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetUseSimTime
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -119,6 +119,7 @@ def generate_launch_description():
     )
 
     nodes = [
+        SetUseSimTime(True),
         gazebo,
         node_robot_state_publisher,
         gz_spawn_entity,
