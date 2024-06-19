@@ -60,6 +60,10 @@ def generate_launch_description():
         ],
     )
 
+    gz_bridge_config_file = PathJoinSubstitution(
+        [FindPackageShare("ugv_ctrl"), "config/gz_bridge.yml"]
+    )
+
     # Get URDF via xacro
     robot_description_content = Command(
         [
@@ -82,6 +86,16 @@ def generate_launch_description():
         executable="robot_state_publisher",
         output="screen",
         parameters=[robot_description],
+    )
+
+    node_gz_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        parameters=[{
+            'config_file': gz_bridge_config_file,
+            'qos_overrides./tf_static.publisher.durability': 'transient_local',
+        }],
+        output='screen'
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -108,7 +122,8 @@ def generate_launch_description():
         gazebo,
         node_robot_state_publisher,
         gz_spawn_entity,
-        joint_state_broadcaster_spawner,
+        # joint_state_broadcaster_spawner,
+        node_gz_bridge,
         robot_controller_spawner,
         rviz_node,
     ]
