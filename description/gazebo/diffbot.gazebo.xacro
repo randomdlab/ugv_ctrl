@@ -24,6 +24,26 @@ https://github.com/ros-simulation/gazebo_ros_demos/blob/kinetic-devel/rrbot_desc
       </plugin>
     </gazebo>
 
+    <gazebo reference="${prefix}caster_frontal_wheel_joint">
+      <mu1>0.0</mu1>
+      <mu2>0.0</mu2>
+    </gazebo>
+
+    <gazebo reference="${prefix}caster_rear_wheel_joint">
+      <mu1>0.0</mu1>
+      <mu2>0.0</mu2>
+    </gazebo>
+
+    <gazebo reference="${prefix}left_wheel_joint">
+      <mu1>1e9</mu1>
+      <mu2>1e9</mu2>
+    </gazebo>
+
+    <gazebo reference="${prefix}right_wheel">
+      <mu1>1e9</mu1>
+      <mu2>1e9</mu2>
+    </gazebo>
+
   </xacro:macro>
 
 </robot>
