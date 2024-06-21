@@ -16,7 +16,12 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    PathJoinSubstitution,
+    LaunchConfiguration,
+)
 from launch_ros.actions import Node, SetUseSimTime
 from launch_ros.substitutions import FindPackageShare
 
@@ -70,7 +75,12 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("ugv_ctrl"), "description", "urdf", "diffbot.urdf.xacro"]
+                [
+                    FindPackageShare("ugv_ctrl"),
+                    "description",
+                    "urdf",
+                    "diffbot.urdf.xacro",
+                ]
             ),
             " ",
             "use_gazebo:=true",
@@ -89,25 +99,35 @@ def generate_launch_description():
     )
 
     node_gz_bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        parameters=[{
-            'config_file': gz_bridge_config_file,
-            'qos_overrides./tf_static.publisher.durability': 'transient_local',
-        }],
-        output='screen'
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        parameters=[
+            {
+                "config_file": gz_bridge_config_file,
+                "qos_overrides./tf_static.publisher.durability": "transient_local",
+            }
+        ],
+        output="screen",
     )
 
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
     )
 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
+        arguments=[
+            "diffbot_base_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
     )
     rviz_node = Node(
         package="rviz2",
@@ -116,6 +136,12 @@ def generate_launch_description():
         output="log",
         arguments=["-d", rviz_config_file],
         condition=IfCondition(gui),
+    )
+
+    node_commander = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ugv_ctrl"), "/launch/commander.launch.py"]
+        ),
     )
 
     nodes = [
@@ -127,6 +153,7 @@ def generate_launch_description():
         node_gz_bridge,
         robot_controller_spawner,
         rviz_node,
+        node_commander,
     ]
 
     return LaunchDescription(declared_arguments + nodes)
