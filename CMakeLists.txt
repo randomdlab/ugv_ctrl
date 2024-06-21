@@ -28,4 +28,10 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+# find_package(rclpy REQUIRED)
+install(DIRECTORY
+  scripts/
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
