@@ -17,10 +17,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <!-- <mesh filename="${mesh_dir}/${mesh_name}.STL" /> -->
-          <cylinder>
-            <radius>0.033</radius>
-            <length>0.035</length>
-          </cylinder>
+          <cylinder radius="0.033" length="0.035" />
         </geometry>
       </collision>
       <inertial>
