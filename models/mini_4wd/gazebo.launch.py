@@ -30,7 +30,6 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node, SetUseSimTime
 from launch_ros.substitutions import FindPackageShare
-import tempfile
 
 template = """
 ---
@@ -210,4 +209,4 @@ def generate_launch_description():
         delay_clean_tmp_file,
     ]
 
-    return LaunchDescription(nodes)
+    return LaunchDescription(declared_arguments + nodes)
