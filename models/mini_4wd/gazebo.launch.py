@@ -13,8 +13,13 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.conditions import IfCondition
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    RegisterEventHandler,
+    ExecuteProcess,
+)
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     Command,
@@ -25,10 +30,36 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node, SetUseSimTime
 from launch_ros.substitutions import FindPackageShare
+import tempfile
 
-
-def prepend_prefix(s: str) -> PythonExpression:
-    return PythonExpression(['"', LaunchConfiguration("prefix"), '"+"', s, '"'])
+template = """
+---
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+- ros_topic_name: "/gz/{model_name}/odometry"
+  gz_topic_name: "/model/{model_name}/odometry"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  direction: GZ_TO_ROS
+- ros_topic_name: "/joint_states"
+  gz_topic_name: "/world/empty/model/{model_name}/joint_state"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "gz.msgs.Model"
+  direction: GZ_TO_ROS
+- ros_topic_name: "/tf"
+  gz_topic_name: "/model/{model_name}/pose"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
+  direction: GZ_TO_ROS
+- ros_topic_name: "/tf_static"
+  gz_topic_name: "/model/{model_name}/pose_static"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
+  direction: GZ_TO_ROS
+"""
 
 
 def generate_launch_description():
@@ -41,11 +72,24 @@ def generate_launch_description():
             description="Prefix to add to the model name.",
         )
     )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "file_path",
+            default_value="",
+            description="Ros2 bag folder path which stores target path.",
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "topic",
+            default_value="",
+            description="Topic of target path.",
+        )
+    )
 
-    prefix = LaunchConfiguration("prefix")
     model_name = "mini_4wd"
-    model_path = PathJoinSubstitution(
-        [FindPackageShare("ugv_ctrl"), "models", model_name]
+    prefix_model_name_py_expr = PythonExpression(
+        ['"', LaunchConfiguration("prefix"), '"+"', model_name, '"']
     )
 
     # gazebo
@@ -64,11 +108,9 @@ def generate_launch_description():
             "-topic",
             "/robot_description",
             "-name",
-            prepend_prefix(model_name),
-            "-allow_renaming",
-            "true",
+            prefix_model_name_py_expr,
             "-z",
-            "3.0",
+            "0.5",
         ],
     )
 
@@ -96,7 +138,7 @@ def generate_launch_description():
                 [FindPackageShare("ugv_ctrl"), f"models/{model_name}/gz_bridge.py"]
             ),
             " ",
-            prepend_prefix(model_name),
+            prefix_model_name_py_expr,
         ]
     )
 
@@ -119,20 +161,42 @@ def generate_launch_description():
         output="screen",
     )
 
+    controller_name = "diff_controller_mini_4wd"
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "diff_controller_mini_4wd",
+            controller_name,
             "--controller-manager",
             "/controller_manager",
         ],
     )
 
-    node_commander = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [FindPackageShare("ugv_ctrl"), "/launch/commander.launch.py"]
-        ),
+    node_commander = Node(
+        package="ugv_ctrl",
+        executable="tracker.py",
+        name="tracker",
+        output="screen",
+        parameters=[
+            {"file_path": LaunchConfiguration("file_path")},
+            {"topic": LaunchConfiguration("topic")},
+        ],
+        remappings=[
+            (
+                "/in/odom",
+                PythonExpression(
+                    ['"/gz/"', '+"', prefix_model_name_py_expr, '"+', '"/odometry"']
+                ),
+            ),
+            ("/out/cmd_vel", f"{controller_name}/cmd_vel"),
+        ],
+    )
+
+    delay_clean_tmp_file = RegisterEventHandler(
+        OnProcessExit(
+            target_action=node_gz_bridge,
+            on_exit=[ExecuteProcess(cmd=["rm", bridge_file_path])],
+        )
     )
 
     nodes = [
@@ -143,6 +207,7 @@ def generate_launch_description():
         node_gz_bridge,
         robot_controller_spawner,
         node_commander,
+        delay_clean_tmp_file,
     ]
 
     return LaunchDescription(nodes)
