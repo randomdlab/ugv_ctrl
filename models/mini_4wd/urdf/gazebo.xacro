@@ -4,7 +4,7 @@
   <gazebo>
     <plugin filename="gz_ros2_control-system"
       name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>$(find ugv_ctrl)/config/diffbot_controllers.yaml</parameters>
+      <parameters>${model_dir}/control_cfg.yml</parameters>
     </plugin>
     <plugin
       filename="gz-sim-joint-state-publisher-system"
