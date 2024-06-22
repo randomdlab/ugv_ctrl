@@ -16,7 +16,7 @@
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="${box_position_x} ${box_position_y} ${box_position_z}" rpy="0 0 0" />
       <geometry>
         <!-- <mesh filename="${mesh_dir}/base_link.STL" /> -->
         <box size="${box_length} ${box_width} ${box_height}" />
