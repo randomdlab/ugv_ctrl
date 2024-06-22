@@ -21,25 +21,32 @@ from launch.substitutions import (
     FindExecutable,
     PathJoinSubstitution,
     LaunchConfiguration,
+    PythonExpression,
 )
 from launch_ros.actions import Node, SetUseSimTime
 from launch_ros.substitutions import FindPackageShare
 
 
-def generate_launch_description():
+def prepend_prefix(s: str) -> PythonExpression:
+    return PythonExpression(['"', LaunchConfiguration("prefix"), '"+"', s, '"'])
 
+
+def generate_launch_description():
     # Declare arguments
     declared_arguments = []
     declared_arguments.append(
         DeclareLaunchArgument(
-            "gui",
-            default_value="false",
-            description="Start RViz2 automatically with this launch file.",
+            "prefix",
+            default_value="",
+            description="Prefix to add to the model name.",
         )
     )
 
-    # Initialize Arguments
-    gui = LaunchConfiguration("gui")
+    prefix = LaunchConfiguration("prefix")
+    model_name = "mini_4wd"
+    model_path = PathJoinSubstitution(
+        [FindPackageShare("ugv_ctrl"), "models", model_name]
+    )
 
     # gazebo
     gazebo = IncludeLaunchDescription(
@@ -57,16 +64,12 @@ def generate_launch_description():
             "-topic",
             "/robot_description",
             "-name",
-            "diffbot",
+            prepend_prefix(model_name),
             "-allow_renaming",
             "true",
             "-z",
             "3.0",
         ],
-    )
-
-    gz_bridge_config_file = PathJoinSubstitution(
-        [FindPackageShare("ugv_ctrl"), "config/gz_bridge.yml"]
     )
 
     # Get URDF via xacro
@@ -77,18 +80,24 @@ def generate_launch_description():
             PathJoinSubstitution(
                 [
                     FindPackageShare("ugv_ctrl"),
-                    "description",
-                    "urdf",
-                    "diffbot.urdf.xacro",
+                    f"models/{model_name}/urdf/all.xacro",
                 ]
             ),
             " ",
-            "use_gazebo:=true",
+            "use_gazebo:=True",
         ]
     )
     robot_description = {"robot_description": robot_description_content}
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("ugv_ctrl"), "description/rviz", "diffbot.rviz"]
+
+    # Get gz_bridge config file
+    bridge_file_path = Command(
+        [
+            PathJoinSubstitution(
+                [FindPackageShare("ugv_ctrl"), f"models/{model_name}/gz_bridge.py"]
+            ),
+            " ",
+            prepend_prefix(model_name),
+        ]
     )
 
     node_robot_state_publisher = Node(
@@ -103,39 +112,21 @@ def generate_launch_description():
         executable="parameter_bridge",
         parameters=[
             {
-                "config_file": gz_bridge_config_file,
+                "config_file": bridge_file_path,
                 "qos_overrides./tf_static.publisher.durability": "transient_local",
             }
         ],
         output="screen",
     )
 
-    joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "joint_state_broadcaster",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-    )
-
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "diffbot_base_controller",
+            "diff_controller_mini_4wd",
             "--controller-manager",
             "/controller_manager",
         ],
-    )
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_config_file],
-        condition=IfCondition(gui),
     )
 
     node_commander = IncludeLaunchDescription(
@@ -149,11 +140,9 @@ def generate_launch_description():
         gazebo,
         node_robot_state_publisher,
         gz_spawn_entity,
-        # joint_state_broadcaster_spawner,
         node_gz_bridge,
         robot_controller_spawner,
-        rviz_node,
         node_commander,
     ]
 
-    return LaunchDescription(declared_arguments + nodes)
+    return LaunchDescription(nodes)

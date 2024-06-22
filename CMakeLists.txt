@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY description bringup/launch bringup/config
+  DIRECTORY models bringup/launch bringup/config
   DESTINATION share/${PROJECT_NAME}
 )
 
