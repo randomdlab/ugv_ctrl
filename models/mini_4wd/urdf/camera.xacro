@@ -5,14 +5,12 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0 " />
       <geometry>
-        <mesh
-          filename="${mesh_dir}/camera_link.DAE" />
+        <mesh filename="${mesh_dir}/camera_link.DAE" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0 " />
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <!-- <mesh filename="${mesh_dir}/camera_link.STL" /> -->
         <box size="0.046 0.165 0.077" />
       </geometry>
     </collision>
