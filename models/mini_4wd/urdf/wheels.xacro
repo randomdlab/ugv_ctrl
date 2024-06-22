@@ -5,6 +5,7 @@
     params="
         link_name
         mesh_name
+        xyz_offset
         *origin *mass *inertia">
     <link name="${link_name}">
       <visual>
@@ -14,10 +15,9 @@
         </geometry>
       </visual>
       <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="${xyz_offset}" rpy="${M_PI/2} 0 0" />
         <geometry>
-          <!-- <mesh filename="${mesh_dir}/${mesh_name}.STL" /> -->
-          <cylinder radius="0.033" length="0.035" />
+          <cylinder radius="0.035" length="0.009" />
         </geometry>
       </collision>
       <inertial>
@@ -44,7 +44,8 @@
 
   <xacro:create_wheel_link
     link_name="$(arg prefix)right_front_wheel_link"
-    mesh_name="right_front_wheel_link">
+    mesh_name="right_front_wheel_link"
+    xyz_offset="0 -0.021 0">
     <origin xyz="6.832E-08 -0.0098111 -7.0676E-07" rpy="0 0 0" />
     <mass value="${wheel_mass}" />
     <inertia
@@ -58,7 +59,8 @@
 
   <xacro:create_wheel_link
     link_name="$(arg prefix)left_front_wheel_link"
-    mesh_name="left_front_wheel_link">
+    mesh_name="left_front_wheel_link"
+    xyz_offset="0 0.021 0">
     <origin xyz="-6.8329E-08 0.0098111 -7.0684E-07" rpy="0 0 0" />
     <mass value="${wheel_mass}" />
     <inertia
@@ -72,7 +74,8 @@
 
   <xacro:create_wheel_link
     link_name="$(arg prefix)right_rear_wheel_link"
-    mesh_name="right_rear_wheel_link">
+    mesh_name="right_rear_wheel_link"
+    xyz_offset="0 -0.021 0">
     <origin xyz="6.832E-08 -0.0098111 -7.0676E-07" rpy="0 0 0" />
     <mass value="${wheel_mass}" />
     <inertia
@@ -86,7 +89,8 @@
 
   <xacro:create_wheel_link
     link_name="$(arg prefix)left_rear_wheel_link"
-    mesh_name="left_rear_wheel_link">
+    mesh_name="left_rear_wheel_link"
+    xyz_offset="0 0.021 0">
     <origin xyz="-6.8366E-08 0.0098111 -7.068E-07" rpy="0 0 0" />
     <mass value="${wheel_mass}" />
     <inertia
