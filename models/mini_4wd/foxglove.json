@@ -1,0 +1,197 @@
+{
+  "configById": {
+    "3D!2vw1bvs": {
+      "cameraState": {
+        "perspective": true,
+        "distance": 16.2901249999421,
+        "phi": 33.45271286537387,
+        "thetaOffset": 102.57422986263458,
+        "targetOffset": [
+          1.7983816112745024,
+          -1.2389361086698312,
+          -1.0904760099830858e-16
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-position",
+      "followTf": "base_link",
+      "scene": {
+        "backgroundColor": "#393939"
+      },
+      "transforms": {
+        "frame:base_link": {
+          "visible": true
+        },
+        "frame:camera_link": {
+          "visible": false
+        },
+        "frame:camera_frame_optical": {
+          "visible": false
+        },
+        "frame:imu_link": {
+          "visible": false
+        },
+        "frame:laser_link": {
+          "visible": false
+        },
+        "frame:left_front_wheel_link": {
+          "visible": false
+        },
+        "frame:left_rear_wheel_link": {
+          "visible": false
+        },
+        "frame:right_front_wheel_link": {
+          "visible": false
+        },
+        "frame:right_rear_wheel_link": {
+          "visible": false
+        },
+        "frame:base_footprint": {
+          "visible": false
+        },
+        "frame:dummy": {
+          "visible": false
+        },
+        "frame:base_link_estimated": {
+          "visible": false
+        }
+      },
+      "topics": {
+        "/out/path/target": {
+          "visible": true
+        },
+        "/out/pose/target": {
+          "visible": true,
+          "axisScale": 2.948
+        },
+        "/robot_description": {
+          "visible": true
+        },
+        "/out/path/real": {
+          "visible": true,
+          "gradient": [
+            "#6bffa2ff",
+            "#6bffee80"
+          ]
+        }
+      },
+      "layers": {
+        "grid": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "44413b68-2b20-471f-85ba-0f54541e1157",
+          "layerId": "foxglove.Grid",
+          "frameId": "odom",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        },
+        "56fac760-c0cc-4674-8305-8642d92556ae": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "URDF",
+          "instanceId": "56fac760-c0cc-4674-8305-8642d92556ae",
+          "layerId": "foxglove.Urdf",
+          "sourceType": "filePath",
+          "url": "",
+          "filePath": "C:\\Users\\regis\\Documents\\workspace\\ugv_ws\\mini_4wd\\urdf\\all.xacro",
+          "parameter": "",
+          "topic": "",
+          "framePrefix": "",
+          "displayMode": "auto",
+          "fallbackColor": "#ffffff",
+          "order": 1
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "Plot!13kk7kw": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/diff_controller_mini_4wd/cmd_vel.twist.angular.z",
+          "enabled": true,
+          "color": "#4e98e2"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "followingViewWidth": 20,
+      "foxglovePanelTitle": "Angular Velocity"
+    },
+    "RawMessages!rxjc4j": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/gz/mini_4wd/odometry.pose.pose"
+    },
+    "RawMessages!2ejv4yt": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/diff_controller_mini_4wd/cmd_vel.twist"
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "first": {
+      "first": "3D!2vw1bvs",
+      "second": "Plot!13kk7kw",
+      "direction": "column",
+      "splitPercentage": 71.3157894736842
+    },
+    "second": {
+      "first": "RawMessages!rxjc4j",
+      "second": "RawMessages!2ejv4yt",
+      "direction": "row"
+    },
+    "direction": "column",
+    "splitPercentage": 76.92307692307693
+  }
+}
