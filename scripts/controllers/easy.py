@@ -25,9 +25,20 @@ def calc_cmd(targets: list[Odometry], pose: Odometry) -> tuple[float, float]:
     x_diff = tgt.pose.pose.position.x - pose.pose.pose.position.x
     y_diff = tgt.pose.pose.position.y - pose.pose.pose.position.y
     pose_diff = math.sqrt(x_diff**2 + y_diff**2)
-    theta = math.atan2(y_diff, x_diff)
+    theta_r = math.atan2(y_diff, x_diff)
+    theta = odom_to_yaw(pose)
+    theta_d = theta_r - theta
+    while theta_d > math.pi:
+        theta_d -= 2 * math.pi
+    while theta_d < -math.pi:
+        theta_d += 2 * math.pi
     vl = 0.0
-    va = (theta - odom_to_yaw(pose)) * 1.0
+    va = theta_d * 1.0
+    # print(f"theta_r: {theta_r}, theta: {theta}, theta_d: {theta_d}")
     if abs(va) < 0.2:
+        vl = min(4.0, pose_diff)
+    elif abs(va) < 0.5:
+        vl = min(3.0, pose_diff)
+    else:
         vl = min(2.0, pose_diff)
     return vl, va
