@@ -86,10 +86,10 @@ class tracker_node(rclpy.node.Node):
     def __init__(self):
         super().__init__("tracker_node")
         self.__msg_tgt_path = Path()
+        self.__msg_real_path = Path()
         self.__tgt_idx = 0
         self.__load_param()
 
-        self.__msg_real_path = Path()
         self.__cur_pose = Odometry()
         self.__sub_odom = self.create_subscription(
             Odometry, "/in/odom", self.__cb_odom, 10
@@ -101,9 +101,11 @@ class tracker_node(rclpy.node.Node):
             Path, "/out/path/target", qos_pub_one_time
         )
         self.__pub_tgt_pose = self.create_publisher(PoseStamped, "/out/pose/target", 2)
+        self.__pub_real_path = self.create_publisher(Path, "/out/path/real", 2)
         self.__pub_cmd = self.create_publisher(TwistStamped, "/out/cmd_vel", 2)
         # self.__tmr_1hz = self.create_timer(1, self.__cb_1hz)
         self.__tmr_20hz_ctrl = self.create_timer(0.05, self.__cb_20hz_ctrl)
+        self.__tmr_update_tgt = self.create_timer(0.1, self.__cb_20hz_update_tgt)
 
         self.__is_first_odom_msg = False
 
@@ -118,6 +120,7 @@ class tracker_node(rclpy.node.Node):
             traj_file_path, traj_topic
         )
         self.__frame_id = self.__msg_tgt_path.header.frame_id
+        self.__msg_real_path.header.frame_id = self.__frame_id
         self.get_logger().info(
             f"Loaded {len(self.__odom_tgt_states)} poses from {traj_file_path} on topic {traj_topic}"
         )
@@ -126,9 +129,11 @@ class tracker_node(rclpy.node.Node):
         self.__cur_pose = msg
         p = PoseStamped()
         p.header = msg.header
+        p.header.frame_id = "odom"
         p.pose.position = msg.pose.pose.position
         p.pose.orientation = msg.pose.pose.orientation
         self.__msg_real_path.poses.append(p)
+        self.__pub_real_path.publish(self.__msg_real_path)
         if not self.__is_first_odom_msg:
             self.__is_first_odom_msg = True
             update_tgts_stamp(
@@ -189,6 +194,22 @@ class tracker_node(rclpy.node.Node):
             self.get_logger().info("Target reached")
             exit(0)
 
+    def __cb_20hz_update_tgt(self):
+        if self.__tgt_idx >= len(self.__odom_tgt_states):
+            self.__tgt_idx -= 1
+            self.get_logger().info("Target reached")
+            self.__tmr_update_tgt.cancel()
+            return
+        self.__tgt_idx += 1
+        tgt = self.__odom_tgt_states[self.__tgt_idx]
+        msg = PoseStamped()
+        msg.header = self.__cur_pose.header
+        msg.pose = tgt.pose.pose
+        self.__pub_tgt_pose.publish(msg)
+        # self.get_logger().info(
+        #     f"Target updated to {msg.pose.position.x}, {msg.pose.position.y}"
+        # )
+
     def __cb_20hz_ctrl(self):
         if not self.__is_first_odom_msg:
             return
@@ -199,7 +220,7 @@ class tracker_node(rclpy.node.Node):
         cmd.twist.linear.x = vl
         cmd.twist.angular.z = va
         self.__pub_cmd.publish(cmd)
-        self.__update_target()
+        # self.__update_target()
 
 
 def main(args=None):
