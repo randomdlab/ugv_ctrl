@@ -195,12 +195,12 @@ class tracker_node(rclpy.node.Node):
             exit(0)
 
     def __cb_20hz_update_tgt(self):
+        self.__tgt_idx += 1
         if self.__tgt_idx >= len(self.__odom_tgt_states):
-            self.__tgt_idx -= 1
+            self.__tgt_idx = len(self.__odom_tgt_states) - 1
             self.get_logger().info("Target reached")
             self.__tmr_update_tgt.cancel()
             return
-        self.__tgt_idx += 1
         tgt = self.__odom_tgt_states[self.__tgt_idx]
         msg = PoseStamped()
         msg.header = self.__cur_pose.header
