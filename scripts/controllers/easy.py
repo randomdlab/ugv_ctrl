@@ -1,8 +1,6 @@
 from nav_msgs.msg import Odometry
 import math
-from scipy.spatial.transform import Rotation as R
 from controllers.utils import odom_to_yaw
-from pyquaternion import Quaternion
 import numpy as np
 
 
