@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 
 import rclpy
 import rclpy.node
@@ -104,7 +104,7 @@ class tracker_node(rclpy.node.Node):
         self.__pub_real_path = self.create_publisher(Path, "/out/path/real", 2)
         self.__pub_cmd = self.create_publisher(TwistStamped, "/out/cmd_vel", 2)
         # self.__tmr_1hz = self.create_timer(1, self.__cb_1hz)
-        self.__tmr_20hz_ctrl = self.create_timer(0.05, self.__cb_20hz_ctrl)
+        self.__tmr_ctrl = self.create_timer(0.03, self.__cb_ctrl)
         self.__tmr_update_tgt = self.create_timer(0.1, self.__cb_20hz_update_tgt)
 
         self.__is_first_odom_msg = False
@@ -210,7 +210,7 @@ class tracker_node(rclpy.node.Node):
         #     f"Target updated to {msg.pose.position.x}, {msg.pose.position.y}"
         # )
 
-    def __cb_20hz_ctrl(self):
+    def __cb_ctrl(self):
         if not self.__is_first_odom_msg:
             return
         vl, va = self.__calc_cmd()
