@@ -78,7 +78,7 @@ def generate_launch_description():
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[controller_cfg_file_path, ("base_frame_id", "dummy")],
+        parameters=[controller_cfg_file_path],
         output="both",
     )
 
