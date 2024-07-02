@@ -216,6 +216,7 @@ class mpc_controller:
 mat_file = "/workspaces/mpc_ws/src/ugv_ctrl/scripts/controllers/mpc.mat"
 ros_ctrl = mpc_controller(mat_file)
 # ros_ctrl.N = 10
+ros_ctrl.sample_time = 0.1
 
 
 def calc_cmd(targets: list[Odometry], pose: Odometry) -> tuple[float, float]:
