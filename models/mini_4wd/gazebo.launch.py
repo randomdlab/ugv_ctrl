@@ -96,7 +96,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments={"gz_args": "-r empty.sdf"}.items(),
+        launch_arguments={"gz_args": "-r empty.sdf -z 200.0"}.items(),
     )
 
     gz_spawn_entity = Node(
@@ -176,10 +176,6 @@ def generate_launch_description():
         executable="tracker.py",
         name="tracker",
         output="screen",
-        parameters=[
-            {"file_path": LaunchConfiguration("file_path")},
-            {"topic": LaunchConfiguration("topic")},
-        ],
         remappings=[
             (
                 "/in/odom",
@@ -188,6 +184,17 @@ def generate_launch_description():
                 ),
             ),
             ("/out/cmd_vel", f"{controller_name}/cmd_vel"),
+        ],
+    )
+
+    node_pub_traj = Node(
+        package="ugv_ctrl",
+        executable="pub_traj.py",
+        name="pub_traj",
+        output="screen",
+        parameters=[
+            {"file_path": LaunchConfiguration("file_path")},
+            {"topic": LaunchConfiguration("topic")},
         ],
     )
 
@@ -206,6 +213,7 @@ def generate_launch_description():
         node_gz_bridge,
         robot_controller_spawner,
         node_commander,
+        node_pub_traj,
         delay_clean_tmp_file,
     ]
 

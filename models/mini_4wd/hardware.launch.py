@@ -144,13 +144,23 @@ def generate_launch_description():
         executable="tracker.py",
         name="tracker",
         output="screen",
+        remappings=[
+            (
+                "/in/odom",
+                "/diff_controller_mini_4wd/odom",
+            ),
+            ("/out/cmd_vel", f"{controller_name}/cmd_vel"),
+        ],
+    )
+
+    node_pub_traj = Node(
+        package="ugv_ctrl",
+        executable="pub_traj.py",
+        name="pub_traj",
+        output="screen",
         parameters=[
             {"file_path": LaunchConfiguration("file_path")},
             {"topic": LaunchConfiguration("topic")},
-        ],
-        remappings=[
-            ("/in/odom", f"{controller_name}/odom"),
-            ("/out/cmd_vel", f"{controller_name}/cmd_vel"),
         ],
     )
 
@@ -179,6 +189,7 @@ def generate_launch_description():
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
         node_commander,
+        node_pub_traj,
     ]
 
     return LaunchDescription(declared_arguments + nodes)
