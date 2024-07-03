@@ -96,7 +96,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments={"gz_args": "-r empty.sdf -z 200.0"}.items(),
+        launch_arguments={"gz_args": "-r empty.sdf -s"}.items(),
     )
 
     gz_spawn_entity = Node(
