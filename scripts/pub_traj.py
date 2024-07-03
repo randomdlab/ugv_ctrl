@@ -63,7 +63,7 @@ class pub_traj_node(rclpy.node.Node):
         self.__odom_tgt_states, self.__msg_tgt_path = load_traj(
             traj_file_path, traj_topic
         )
-        self.__tmr_pub_traj = self.create_timer(0.8, self.__cb_pub_traj)
+        self.__tmr_pub_traj = self.create_timer(0.25, self.__cb_pub_traj)
         self.__pub_odom = self.create_publisher(Odometry, "target", 5)
         self.__pub_pose = self.create_publisher(PoseStamped, "target_pose", 5)
         qos_pub_one_time = rclpy.qos.QoSProfile(
