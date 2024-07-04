@@ -3,13 +3,13 @@
     "3D!2vw1bvs": {
       "cameraState": {
         "perspective": true,
-        "distance": 16.2901249999421,
-        "phi": 33.45271286537387,
-        "thetaOffset": 102.57422986263458,
+        "distance": 18.999999999929432,
+        "phi": 33.046932304686685,
+        "thetaOffset": 74.28965726743544,
         "targetOffset": [
-          1.7983816112745024,
-          -1.2389361086698312,
-          -1.0904760099830858e-16
+          0.6408202041598878,
+          6.020109979417977,
+          -7.970913776525968e-17
         ],
         "target": [
           0,
@@ -27,7 +27,7 @@
         "far": 5000
       },
       "followMode": "follow-position",
-      "followTf": "base_link",
+      "followTf": "odom",
       "scene": {
         "backgroundColor": "#393939"
       },
@@ -86,6 +86,20 @@
             "#6bffa2ff",
             "#6bffee80"
           ]
+        },
+        "/move_base_simple/goal": {
+          "visible": false
+        },
+        "/target_pose": {
+          "visible": false
+        },
+        "/target_path": {
+          "visible": true
+        },
+        "/out/pose/track": {
+          "visible": true,
+          "type": "arrow",
+          "color": "#e3ff6bff"
         }
       },
       "layers": {
@@ -112,7 +126,7 @@
           ]
         },
         "56fac760-c0cc-4674-8305-8642d92556ae": {
-          "visible": true,
+          "visible": false,
           "frameLocked": true,
           "label": "URDF",
           "instanceId": "56fac760-c0cc-4674-8305-8642d92556ae",
@@ -145,19 +159,27 @@
           "timestampMethod": "receiveTime",
           "value": "/diff_controller_mini_4wd/cmd_vel.twist.angular.z",
           "enabled": true,
-          "color": "#4e98e2"
+          "color": "#4e98e2",
+          "label": "v_angle"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/diff_controller_mini_4wd/odom.twist.twist.linear.x",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "v_linear"
         }
       ],
       "showXAxisLabels": true,
       "showYAxisLabels": true,
-      "showLegend": false,
+      "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
       "followingViewWidth": 20,
-      "foxglovePanelTitle": "Angular Velocity"
+      "foxglovePanelTitle": "Velocity"
     },
     "RawMessages!rxjc4j": {
       "diffEnabled": false,
